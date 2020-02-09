@@ -17,8 +17,6 @@ use index_versions::v2::index_models::{
     StorkEntry, StorkEntryMetadata, StorkFieldable, StorkIndex, StorkResult, StorkResultsAndAliases,
 };
 
-use serde::Serialize;
-
 use wasm_bindgen::prelude::*;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
@@ -79,7 +77,7 @@ pub fn build_index(config: &ConfigInput) -> StorkIndex {
             meta: StorkEntryMetadata {
                 title: stork_file.title.clone(),
                 url: stork_file.url.clone(),
-                fields: None, // fields: stork_file.fields,
+                fields: stork_fields,
             },
         };
 

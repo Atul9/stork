@@ -2,7 +2,6 @@ use std::iter::FromIterator;
 use std::collections::HashMap;
 use crate::index_versions::v1::index_models::*;
 use crate::index_versions::v1::index_helpers::*;
-use crate::utils::get_index_version;
 
 pub fn perform_search(index: &[u8], query: &String) -> Vec<StorkOutput> {
     let normalized_query = query.to_lowercase();
@@ -48,8 +47,6 @@ pub fn perform_search(index: &[u8], query: &String) -> Vec<StorkOutput> {
 }
 
 fn perform_word_lookup(index: &[u8], query: &String) -> Vec<StorkResult> {
-    let version = get_index_version(index);
-
     let full_results = get_index_results(index);
 
         let query_result: Vec<StorkResultOrAlias> = full_results
