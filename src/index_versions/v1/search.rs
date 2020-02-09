@@ -43,6 +43,7 @@ pub fn perform_search(index: &[u8], query: &String) -> Vec<StorkOutput> {
     let mut output_vector = Vec::from_iter(output_map.values().cloned());
     // eventually sort by score instead
     output_vector.sort_by_key(|o| o.result.file_index);
+    // return serde_json::to_string(&output_vector);
     return output_vector;
 }
 

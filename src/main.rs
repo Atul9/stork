@@ -6,8 +6,8 @@ use std::fs;
 use std::fs::File;
 use std::io::{BufReader, Read};
 
-use stork::models::config::Config;
-use stork::{build_index, perform_search, write_index};
+use stork::config::Config;
+use stork::{build_index, internal_search, write_index};
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -32,7 +32,7 @@ fn main() {
         let mut index: Vec<u8> = Vec::new();
         let bytes_read = buf_reader.read_to_end(&mut index);
         println!("{} bytes read", bytes_read.unwrap());
-        let results = perform_search(&index, &args[3]);
+        let results = internal_search(&index, &args[3]);
         println!("{}", serde_json::to_string_pretty(&results).unwrap());
     }
 }

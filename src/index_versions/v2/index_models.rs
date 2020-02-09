@@ -23,7 +23,7 @@ pub struct StorkEntryMetadata {
 
 type OptionalStorkFieldList = Option<Vec<StorkField>>;
 
-trait StorkFieldable {
+pub trait StorkFieldable {
     fn to_stork_fields(&self) -> OptionalStorkFieldList;
 }
 
@@ -34,8 +34,8 @@ impl StorkFieldable for OptionalConfigFieldList {
             Some(vec) => {
                 Some(
                     vec.iter().map(|cf| StorkField {
-                        key: cf.key,
-                        val: cf.val
+                        key: cf.key.clone(),
+                        val: cf.val.clone()
                     }).collect()
                 )
             },

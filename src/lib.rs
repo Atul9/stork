@@ -1,10 +1,10 @@
 use console_error_panic_hook;
 
 use std::collections::HashMap;
-use std::path::Path;
 use std::fs::File;
 use std::io::{BufReader, BufWriter};
 use std::io::{Read, Write};
+use std::path::Path;
 
 pub mod config;
 use config::*;
@@ -14,8 +14,10 @@ use utils::{get_index_version, remove_surrounding_punctuation};
 
 mod index_versions;
 use index_versions::v2::index_models::{
-    StorkEntry, StorkEntryMetadata, StorkIndex, StorkResult, StorkResultsAndAliases,
+    StorkEntry, StorkEntryMetadata, StorkFieldable, StorkIndex, StorkResult, StorkResultsAndAliases,
 };
+
+use serde::Serialize;
 
 use wasm_bindgen::prelude::*;
 
@@ -35,14 +37,21 @@ extern "C" {
 #[wasm_bindgen]
 pub fn search(index: &[u8], query: String) -> String {
     console_error_panic_hook::set_once();
-    let v = get_index_version(&index);
-    let function = match v.as_str() {
-        "stork-1.0.0" => index_versions::v1::search::perform_search,
-        "stork-2" => index_versions::v2::search::perform_search,
-        _ => panic!("Unknown index version"),
-    };
+    return serde_json::to_string(&internal_search(index, &query)).unwrap();
+}
 
-    return serde_json::to_string(&function(&index, &query)).unwrap();
+pub fn internal_search(
+    index: &[u8],
+    query: &String,
+) -> Vec<index_versions::v1::index_models::StorkOutput> {
+    let v = get_index_version(&index);
+    let function: fn(&[u8], &String) -> Vec<index_versions::v1::index_models::StorkOutput> =
+        match v.as_str() {
+            "stork-1.0.0" => index_versions::v1::search::perform_search,
+            "stork-2" => index_versions::v2::search::perform_search,
+            _ => panic!("Unknown index version"),
+        };
+    return function(index, query);
 }
 
 #[wasm_bindgen]
@@ -63,15 +72,14 @@ pub fn build_index(config: &ConfigInput) -> StorkIndex {
         let mut buf_reader = BufReader::new(file);
         let mut contents = String::new();
         let _bytes_read = buf_reader.read_to_string(&mut contents);
-        let stork_fields = stork_file.fields;
+        let stork_fields = stork_file.fields.to_stork_fields();
 
         let entry = StorkEntry {
             contents: contents,
             meta: StorkEntryMetadata {
                 title: stork_file.title.clone(),
                 url: stork_file.url.clone(),
-                fields: None
-                // fields: stork_file.fields,
+                fields: None, // fields: stork_file.fields,
             },
         };
 
