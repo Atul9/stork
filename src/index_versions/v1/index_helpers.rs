@@ -1,15 +1,7 @@
 use std::collections::HashMap;
 use std::convert::TryInto;
 
-use crate::models::{StorkEntry, StorkResultOrAlias};
-
-pub fn get_index_version(index: &[u8]) -> String {
-    let (version_size_bytes, rest) = index.split_at(std::mem::size_of::<u64>());
-    let version_size = u64::from_be_bytes(version_size_bytes.try_into().unwrap());
-    let (version_bytes, _rest) = rest.split_at(version_size as usize);
-    let version = String::from_utf8(version_bytes.to_vec()).unwrap();
-    return version;
-}
+use crate::index_versions::v1::index_models::{StorkEntry, StorkResultOrAlias};
 
 pub fn get_index_entries(index: &[u8]) -> Vec<StorkEntry> {
     let (version_size_bytes, rest) = index.split_at(std::mem::size_of::<u64>());

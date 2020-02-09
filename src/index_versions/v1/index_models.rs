@@ -1,8 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-pub mod config;
-
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct StorkEntry {
     pub path: String,
