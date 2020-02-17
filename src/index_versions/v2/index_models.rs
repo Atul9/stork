@@ -1,6 +1,5 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use crate::config::OptionalConfigFieldList;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct StorkIndex {
@@ -18,36 +17,7 @@ pub struct StorkEntry {
 pub struct StorkEntryMetadata {
     pub title: String,
     pub url: String,
-    pub fields: Option<Vec<StorkField>>,
-}
-
-type OptionalStorkFieldList = Option<Vec<StorkField>>;
-
-pub trait StorkFieldable {
-    fn to_stork_fields(&self) -> OptionalStorkFieldList;
-}
-
-impl StorkFieldable for OptionalConfigFieldList {
-    #[inline]
-    fn to_stork_fields(&self) -> OptionalStorkFieldList {
-        match self {
-            Some(vec) => {
-                Some(
-                    vec.iter().map(|cf| StorkField {
-                        key: cf.key.clone(),
-                        val: cf.val.clone()
-                    }).collect()
-                )
-            },
-            None => None,
-        }
-    }
-}
-
-#[derive(Clone, Serialize, Deserialize, Debug)]
-pub struct StorkField {
-    pub key: String,
-    pub val: String,
+    pub fields: Option<HashMap<String, String>>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -69,7 +39,7 @@ impl StorkResultsAndAliases {
 pub struct StorkResult {
     pub indices_within_entry: Vec<u32>,
     pub score: u8,
-    pub fields: Option<Vec<StorkField>>,
+    pub fields: Option<HashMap<String, String>>,
 }
 
 impl StorkResult {

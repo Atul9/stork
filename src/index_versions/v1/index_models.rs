@@ -6,13 +6,7 @@ pub struct StorkEntry {
     pub path: String,
     pub url: String,
     pub title: String,
-    pub fields: Option<Vec<StorkField>>,
-}
-
-#[derive(Clone, Serialize, Deserialize, Debug)]
-pub struct StorkField {
-    key: String,
-    value: String,
+    pub fields: Option<HashMap<String, String>>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]

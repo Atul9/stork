@@ -1,4 +1,6 @@
+use std::collections::HashMap;
 use serde::Deserialize;
+
 
 #[derive(Deserialize)]
 pub struct Config {
@@ -13,24 +15,16 @@ pub struct ConfigInput {
     pub files: Option<Vec<StorkFile>>,
 }
 
-pub type OptionalConfigFieldList = Option<Vec<ConfigField>>;
-
 #[derive(Deserialize)]
 pub struct StorkFile {
     pub path: String,
     pub url: String,
     pub title: String,
-    pub fields: OptionalConfigFieldList
+    pub fields: Option<HashMap<String, String>>
 }
 
 #[derive(Deserialize)]
 pub struct ConfigOutput {
     pub filename: String,
     pub debug: Option<bool>,
-}
-
-#[derive(Deserialize)]
-pub struct ConfigField {
-    pub key: String,
-    pub val: String,
 }

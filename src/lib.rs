@@ -12,9 +12,12 @@ use config::*;
 mod utils;
 use utils::{get_index_version, remove_surrounding_punctuation};
 
+mod search_output;
+use search_output::Entry;
+
 mod index_versions;
 use index_versions::v2::index_models::{
-    StorkEntry, StorkEntryMetadata, StorkFieldable, StorkIndex, StorkResult, StorkResultsAndAliases,
+    StorkEntry, StorkEntryMetadata, StorkIndex, StorkResult, StorkResultsAndAliases,
 };
 
 use wasm_bindgen::prelude::*;
@@ -38,17 +41,15 @@ pub fn search(index: &[u8], query: String) -> String {
     return serde_json::to_string(&internal_search(index, &query)).unwrap();
 }
 
-pub fn internal_search(
-    index: &[u8],
-    query: &String,
-) -> Vec<index_versions::v1::index_models::StorkOutput> {
+pub fn internal_search(index: &[u8], query: &String) -> Vec<Entry> {
     let v = get_index_version(&index);
-    let function: fn(&[u8], &String) -> Vec<index_versions::v1::index_models::StorkOutput> =
-        match v.as_str() {
-            "stork-1.0.0" => index_versions::v1::search::perform_search,
-            "stork-2" => index_versions::v2::search::perform_search,
-            _ => panic!("Unknown index version"),
-        };
+
+    let function: fn(&[u8], &String) -> Vec<Entry> = match v.as_str() {
+        // "stork-1.0.0" => index_versions::v1::search::perform_search,
+        "stork-2" => index_versions::v2::search::perform_search,
+        _ => panic!("Unknown index version"),
+    };
+
     return function(index, query);
 }
 
@@ -70,7 +71,7 @@ pub fn build_index(config: &ConfigInput) -> StorkIndex {
         let mut buf_reader = BufReader::new(file);
         let mut contents = String::new();
         let _bytes_read = buf_reader.read_to_string(&mut contents);
-        let stork_fields = stork_file.fields.to_stork_fields();
+        let stork_fields = stork_file.fields.clone();
 
         let entry = StorkEntry {
             contents: contents,
